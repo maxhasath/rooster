@@ -33,6 +33,28 @@ test.describe.serial('Login tests', () => {
       expect(await loginPage.getErrorMessage()).toBe(ENV.INVALID_CREDENTIALS_MESSAGE);
     });
   });
+
+  test('Unsuccessful login with invalid email and valid password', async () => {
+    await test.step('Fill in invalid email with valid password and submit', async () => {
+      await loginPage.login(ENV.INVALID_EMAIL, ENV.VALID_PASSWORD);
+    });
+
+    await test.step('Verify error message is displayed', async () => {
+      await expect(loginPage.errorNotification).toBeVisible({ timeout: 10000 });
+      expect(await loginPage.getErrorMessage()).toBe(ENV.INVALID_CREDENTIALS_MESSAGE);
+    });
+  });
+
+  test('Unsuccessful login with valid email and invalid password', async () => {
+    await test.step('Fill in valid email with invalid password and submit', async () => {
+      await loginPage.login(ENV.VALID_EMAIL, ENV.INVALID_PASSWORD);
+    });
+
+    await test.step('Verify error message is displayed', async () => {
+      await expect(loginPage.errorNotification).toBeVisible({ timeout: 10000 });
+      expect(await loginPage.getErrorMessage()).toBe(ENV.INVALID_CREDENTIALS_MESSAGE);
+    });
+  });
 });
 
 test.describe.serial('Logout tests', () => {

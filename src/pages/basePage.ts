@@ -15,6 +15,10 @@ export class BasePage {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
+  async openManageMenu(): Promise<void> {
+    await this.page.locator('.main-menu-item.manage .ant-menu-submenu-title').first().click();
+  }
+
   async clickButtonUntilInvisible(buttonLocator: Locator): Promise<void> {
     let isButtonVisible = true;
 
