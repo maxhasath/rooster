@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rooster Playwright Framework - Full Explanation</title>
+  <style>
+    body {
+      font-family: Calibri, Arial, sans-serif;
+      font-size: 11pt;
+      line-height: 1.5;
+      margin: 2.54cm;
+      color: #000;
+    }
+    h1 {
+      font-size: 20pt;
+      color: #1F3864;
+      border-bottom: 2px solid #1F3864;
+      padding-bottom: 6px;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 14pt;
+      color: #2E74B5;
+      margin-top: 24px;
+      margin-bottom: 8px;
+    }
+    h3 {
+      font-size: 12pt;
+      color: #2E74B5;
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+    pre {
+      background: #F2F2F2;
+      border: 1px solid #D9D9D9;
+      border-left: 4px solid #2E74B5;
+      padding: 10px 14px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9pt;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      page-break-inside: avoid;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9.5pt;
+      background: #F2F2F2;
+      padding: 1px 4px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12px 0;
+    }
+    th {
+      background: #2E74B5;
+      color: white;
+      padding: 8px 10px;
+      text-align: left;
+      font-size: 10pt;
+    }
+    td {
+      border: 1px solid #BDD7EE;
+      padding: 7px 10px;
+      font-size: 10pt;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #DEEAF1;
+    }
+    .note {
+      background: #EBF3FB;
+      border-left: 4px solid #2E74B5;
+      padding: 8px 12px;
+      margin: 10px 0;
+    }
+    .warning {
+      background: #FFF2CC;
+      border-left: 4px solid #FFD700;
+      padding: 8px 12px;
+      margin: 10px 0;
+    }
+    ul, ol {
+      margin: 6px 0;
+      padding-left: 22px;
+    }
+    li {
+      margin-bottom: 4px;
+    }
+    .section-divider {
+      border: none;
+      border-top: 1px solid #BDD7EE;
+      margin: 28px 0;
+    }
+    .cover {
+      text-align: center;
+      padding: 60px 0 40px 0;
+    }
+    .cover h1 {
+      font-size: 26pt;
+      border: none;
+      margin-bottom: 8px;
+    }
+    .cover .subtitle {
+      font-size: 14pt;
+      color: #2E74B5;
+      margin-bottom: 30px;
+    }
+    .cover .meta {
+      font-size: 10pt;
+      color: #666;
+    }
+    .toc {
+      background: #EBF3FB;
+      border: 1px solid #BDD7EE;
+      padding: 14px 20px;
+      margin: 20px 0 30px 0;
+    }
+    .toc h2 {
+      margin-top: 4px;
+    }
+    .toc ol {
+      margin: 0;
+    }
+    .toc li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <h1>Rooster Playwright Framework</h1>
+  <div class="subtitle">Full Framework Explanation for QA Teams</div>
+  <div class="meta">
+    Project: Rooster QA Automation<br>
+    Application: https://qa.rooster-next-level.click<br>
+    Stack: Playwright · TypeScript · Page Object Model<br>
+    Date: April 2026
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">Folder Structure</a></li>
+    <li><a href="#s2">Page Object Model (POM) Architecture</a></li>
+    <li><a href="#s3">Key Files Explained</a></li>
+    <li><a href="#s4">End-to-End Flow (How a Test Runs)</a></li>
+    <li><a href="#s5">Helpers &amp; Utilities</a></li>
+    <li><a href="#s6">How to Add New Tests</a></li>
+    <li><a href="#s7">Common Pitfalls &amp; How to Avoid Them</a></li>
+  </ol>
+</div>
+
+<hr class="section-divider">
+
+<!-- SECTION 1 -->
+<h2 id="s1">1. Folder Structure</h2>
+
+<p>The project follows a clean, flat structure where every directory has a single responsibility:</p>
+
+<pre>playwright-master/
+├── helper/
+│   └── env/
+│       ├── .env.test          ← QA environment variables
+│       ├── .env.stage         ← Staging (placeholder)
+│       └── .env.prod          ← Production (placeholder)
+│
+├── src/
+│   ├── pages/                 ← Page Object classes
+│   │   ├── basePage.ts        ← Shared utilities inherited by all pages
+│   │   ├── loginPage.ts       ← Login screen interactions
+│   │   ├── profilePage.ts     ← Profile dropdown + edit form
+│   │   └── timeOffPage.ts     ← Sidebar navigation + Time Off page
+│   │
+│   ├── tests/                 ← All test specs + auth setup
+│   │   ├── auth.setup.ts      ← Runs once: logs in, saves session
+│   │   ├── login.spec.ts      ← Login + Logout tests
+│   │   ├── profile.spec.ts    ← Profile edit tests
+│   │   └── timeOff.spec.ts    ← Time Off navigation test
+│   │
+│   └── utils/
+│       ├── env.ts             ← Typed ENV wrapper over process.env
+│       ├── globalSetup.ts     ← Loads .env file before any test runs
+│       └── authentication.json ← Saved browser session (auto-generated)
+│
+├── playwright.config.ts       ← Playwright global config
+├── package.json               ← Project dependencies and npm scripts
+└── tsconfig.json              ← TypeScript configuration</pre>
+
+<div class="note">
+  <strong>Key principle:</strong> Tests never contain selectors or URLs. Those live in page objects and the ENV class respectively. This means a UI change requires updating only the page object, not every test that uses it.
+</div>
+
+<hr class="section-divider">
+
+<!-- SECTION 2 -->
+<h2 id="s2">2. Page Object Model (POM) Architecture</h2>
+
+<p>The Page Object Model is a design pattern where every screen (or section of a screen) has its own class. Tests talk to page objects; page objects talk to the browser. This gives you a single place to update when the UI changes.</p>
+
+<h3>Class Hierarchy</h3>
+
+<pre>BasePage
+  └── LoginPage
+  └── ProfilePage
+  └── TimeOffPage</pre>
+
+<p><strong>BasePage</strong> holds utilities every page needs: <code>goto(url)</code>, <code>pause(ms)</code>, and a helper to click a button until it disappears. All page classes extend it, so they all inherit these methods automatically.</p>
+
+<h3>Locators as Getters (not stored in the constructor)</h3>
+
+<p>Every selector is defined as a TypeScript <code>get</code> property, not a variable set in the constructor. This matters because Playwright locators are lazy — they do not interact with the DOM until an action is performed. Re-creating the locator on each access avoids stale element references:</p>
+
+<pre>// CORRECT — fresh locator every time
+get firstNameInput(): Locator {
+  return this.page.locator('input[name="firstName"]');
+}
+
+// AVOID — if the DOM changes after page load, this reference goes stale
+constructor(page: Page) {
+  this.firstNameInput = page.locator('input[name="firstName"]'); // fragile
+}</pre>
+
+<h3>Actions as Methods</h3>
+
+<p>Multi-step interactions are encapsulated as named methods. Tests call a descriptive method, not a chain of clicks:</p>
+
+<pre>// In ProfilePage
+async updateName(firstName: string, lastName: string): Promise&lt;void&gt; {
+  await this.firstNameInput.clear();
+  await this.firstNameInput.fill(firstName);
+  await this.lastNameInput.clear();
+  await this.lastNameInput.fill(lastName);
+  await this.updateButton.click();
+}
+
+// In the test — clean and readable
+await profilePage.updateName('AutoTest', 'User');</pre>
+
+<hr class="section-divider">
+
+<!-- SECTION 3 -->
+<h2 id="s3">3. Key Files Explained</h2>
+
+<h3>playwright.config.ts</h3>
+<p>The central configuration file that controls how all tests run. The most important settings:</p>
+
+<table>
+  <tr><th>Setting</th><th>Value</th><th>Why</th></tr>
+  <tr><td><code>globalSetup</code></td><td>./src/utils/globalSetup</td><td>Runs before any test — loads the .env file into process.env</td></tr>
+  <tr><td><code>storageState</code></td><td>authentication.json</td><td>Default session for all tests (authenticated)</td></tr>
+  <tr><td><code>dependencies: ['setup']</code></td><td>auth.setup project</td><td>Forces auth.setup.ts to run before any spec file</td></tr>
+  <tr><td><code>viewport</code></td><td>1920×1080</td><td>Consistent full-size window — avoids mobile layout issues</td></tr>
+  <tr><td><code>baseURL</code></td><td>ENV.BASE_URL</td><td>Centralises the app URL so tests don't hardcode it</td></tr>
+</table>
+
+<p>The config defines two Playwright "projects": <strong>setup</strong> (runs auth.setup.ts once) and <strong>Google Chrome</strong> (runs all spec files, depends on setup finishing first).</p>
+
+<h3>auth.setup.ts</h3>
+<p>This is the login-once file. It performs a real browser login, waits for the dashboard URL to confirm success, then saves the entire browser session (cookies, localStorage, sessionStorage) to <code>authentication.json</code>. Every subsequent test loads that file instead of logging in again.</p>
+
+<pre>const authFile = 'src/utils/authentication.json';
+
+setup('save authenticated session', async ({ page }) =&gt; {
+  await page.goto(ENV.LOGIN_LINK);
+  await page.locator('input[name="email"]').fill(ENV.VALID_EMAIL);
+  await page.locator('input[name="password"]').fill(ENV.VALID_PASSWORD);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page).toHaveURL(ENV.HOME_PAGE_LINK, { timeout: 15000 });
+  await page.context().storageState({ path: authFile }); // ← saves session
+});</pre>
+
+<h3>globalSetup.ts</h3>
+<p>Runs once before the entire test suite (not before each test). Its only job is to read the correct <code>.env</code> file based on the <code>test_env</code> environment variable and push its values into <code>process.env</code>:</p>
+
+<pre>import * as dotenv from 'dotenv';
+
+async function globalSetup() {
+  if (process.env.test_env) {
+    dotenv.config({
+      path: `helper/env/.env.${process.env.test_env}`,
+      override: true,
+    });
+  }
+}
+
+export default globalSetup;</pre>
+
+<p>Running <code>test_env=test npx playwright test</code> causes this to load <code>.env.test</code>. Changing to <code>test_env=stage</code> loads <code>.env.stage</code> — no test code changes required.</p>
+
+<h3>env.ts</h3>
+<p>A typed class that wraps <code>process.env</code>. Without this, TypeScript would have no idea what keys exist in process.env and would throw type errors. Every env variable used in tests is declared here as a public static property:</p>
+
+<pre>export default class ENV {
+  public static BASE_URL = process.env.BASE_URL;
+  public static LOGIN_LINK = process.env.LOGIN_LINK;
+  public static HOME_PAGE_LINK = process.env.HOME_PAGE_LINK;
+  public static TIME_OFF_URL = process.env.TIME_OFF_URL;
+  public static VALID_EMAIL = process.env.VALID_EMAIL;
+  public static VALID_PASSWORD = process.env.VALID_PASSWORD;
+  public static INVALID_CREDENTIALS_MESSAGE = process.env.INVALID_CREDENTIALS_MESSAGE;
+  public static NONEXISTING_EMAIL = process.env.NONEXISTING_EMAIL;
+  public static PROFILE_REQUIRED_ERROR = process.env.PROFILE_REQUIRED_ERROR;
+  public static PROFILE_SUCCESS_MESSAGE = process.env.PROFILE_SUCCESS_MESSAGE;
+}</pre>
+
+<hr class="section-divider">
+
+<!-- SECTION 4 -->
+<h2 id="s4">4. End-to-End Flow (How a Test Runs)</h2>
+
+<p>When you run <code>npm run test:chrome</code>, here is the exact sequence of events:</p>
+
+<ol>
+  <li><strong>globalSetup.ts fires.</strong> It reads <code>test_env</code> from the shell and loads the matching <code>.env</code> file. All process.env values are now populated.</li>
+  <li><strong>auth.setup.ts fires (setup project).</strong> A fresh browser opens, logs in, waits for the dashboard URL, saves the session to <code>authentication.json</code>, then closes.</li>
+  <li><strong>Google Chrome project starts.</strong> Each spec file runs in its own browser context. That context is pre-loaded with the session from <code>authentication.json</code>, so every test starts already logged in.</li>
+  <li><strong>Each test's <code>beforeEach</code> runs.</strong> For most tests, this navigates to the home page. For login tests, the <code>test.use({ storageState: { cookies: [], origins: [] } })</code> override wipes the session first so the test sees a logged-out state.</li>
+  <li><strong>The test body runs.</strong> It calls page object methods. The page object locators interact with the live DOM. Assertions use <code>expect()</code> with built-in retry/wait logic.</li>
+  <li><strong>After all tests complete</strong>, Playwright generates the HTML report (stored in <code>playwright-report/</code>).</li>
+</ol>
+
+<h3>Authentication Flow Diagram</h3>
+
+<pre>npm run test:chrome
+       │
+       ▼
+globalSetup.ts ──── loads .env.test ──── process.env populated
+       │
+       ▼
+auth.setup.ts ──── real browser login ──── saves authentication.json
+       │
+       ▼
+login.spec.ts ──── Login describe: uses EMPTY storageState (no session)
+               ──── Logout describe: uses authentication.json (logged in)
+       │
+       ▼
+profile.spec.ts ── uses authentication.json (logged in)
+       │
+       ▼
+timeOff.spec.ts ── uses authentication.json (logged in)</pre>
+
+<hr class="section-divider">
+
+<!-- SECTION 5 -->
+<h2 id="s5">5. Helpers &amp; Utilities</h2>
+
+<h3>BasePage — Shared Actions</h3>
+
+<table>
+  <tr><th>Method</th><th>Description</th></tr>
+  <tr><td><code>goto(url)</code></td><td>Navigate to any URL. Inherited by all page objects.</td></tr>
+  <tr><td><code>pause(ms)</code></td><td>Wait for a fixed number of milliseconds. Use sparingly — prefer Playwright's built-in waits.</td></tr>
+  <tr><td><code>clickButtonUntilInvisible(locator)</code></td><td>Clicks a button repeatedly until it disappears from the DOM. Useful for dismissing banners or retrying flaky UI elements.</td></tr>
+</table>
+
+<h3>ProfilePage — Actions</h3>
+
+<table>
+  <tr><th>Method</th><th>Description</th></tr>
+  <tr><td><code>openProfileDropdown()</code></td><td>Clicks the avatar trigger in the top-right corner</td></tr>
+  <tr><td><code>navigateToAccount()</code></td><td>Opens the dropdown then clicks "Account"</td></tr>
+  <tr><td><code>signOut()</code></td><td>Opens the dropdown then clicks "Sign out"</td></tr>
+  <tr><td><code>clickEdit()</code></td><td>Clicks the Edit button on the profile page (uses <code>.first()</code> because two btn-edit elements exist on the page)</td></tr>
+  <tr><td><code>updateName(firstName, lastName)</code></td><td>Clears and fills both name fields then clicks Update</td></tr>
+</table>
+
+<h3>ENV Class — Key Variables</h3>
+
+<table>
+  <tr><th>Variable</th><th>Value (test env)</th></tr>
+  <tr><td><code>LOGIN_LINK</code></td><td>https://qa.rooster-next-level.click/sign-in</td></tr>
+  <tr><td><code>HOME_PAGE_LINK</code></td><td>https://qa.rooster-next-level.click/dashboard</td></tr>
+  <tr><td><code>TIME_OFF_URL</code></td><td>https://qa.rooster-next-level.click/manage/time-off</td></tr>
+  <tr><td><code>VALID_EMAIL</code></td><td>geethmi+rooster2@calcey.com</td></tr>
+  <tr><td><code>PROFILE_REQUIRED_ERROR</code></td><td>"Required"</td></tr>
+  <tr><td><code>PROFILE_SUCCESS_MESSAGE</code></td><td>"Profile updated!"</td></tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- SECTION 6 -->
+<h2 id="s6">6. How to Add New Tests</h2>
+
+<p>Follow these four steps every time you add coverage for a new feature:</p>
+
+<h3>Step 1 — Add selectors to the relevant page object (or create a new one)</h3>
+<p>If the feature is on an existing page, add a getter to that page's class. If it's a new page, create a new <code>src/pages/featurePage.ts</code> that extends <code>BasePage</code>.</p>
+
+<pre>// In src/pages/featurePage.ts
+import { Page, Locator } from '@playwright/test';
+import { BasePage } from './basePage';
+
+export class FeaturePage extends BasePage {
+  constructor(page: Page) { super(page); }
+
+  get someButton(): Locator {
+    return this.page.locator('button.some-class');
+  }
+
+  async doSomething(): Promise&lt;void&gt; {
+    await this.someButton.click();
+  }
+}</pre>
+
+<h3>Step 2 — Add any new environment variables to .env.test and env.ts</h3>
+<p>If your test asserts a specific message or navigates to a specific URL, add it to the env file first:</p>
+
+<pre># In helper/env/.env.test
+FEATURE_SUCCESS_MSG = "Action completed!"
+FEATURE_URL = "https://qa.rooster-next-level.click/feature"</pre>
+
+<pre>// In src/utils/env.ts
+public static FEATURE_SUCCESS_MSG = process.env.FEATURE_SUCCESS_MSG;
+public static FEATURE_URL = process.env.FEATURE_URL;</pre>
+
+<h3>Step 3 — Write the test in a spec file</h3>
+<p>Either add to an existing spec or create a new one:</p>
+
+<pre>// src/tests/feature.spec.ts
+import { test, expect } from '@playwright/test';
+import ENV from '../utils/env';
+import { FeaturePage } from '../pages/featurePage';
+
+test.describe.serial('Feature tests', () =&gt; {
+  let featurePage: FeaturePage;
+
+  test.beforeEach(async ({ page }) =&gt; {
+    featurePage = new FeaturePage(page);
+    await page.goto(ENV.HOME_PAGE_LINK);
+  });
+
+  test('Should do the thing', async ({ page }) =&gt; {
+    await test.step('Navigate to feature', async () =&gt; {
+      await featurePage.doSomething();
+      await expect(page).toHaveURL(ENV.FEATURE_URL, { timeout: 10000 });
+    });
+
+    await test.step('Verify success message', async () =&gt; {
+      // assertions here
+    });
+  });
+});</pre>
+
+<h3>Step 4 — Run your test to verify</h3>
+<pre>npm run test:chrome -- --grep "Should do the thing"</pre>
+
+<div class="note">
+  <strong>Checklist before committing a new test:</strong><br>
+  ✓ Selectors are in the page object, not in the test<br>
+  ✓ Asserted strings are in .env.test and referenced via ENV class<br>
+  ✓ Test uses <code>test.step()</code> to group logical steps<br>
+  ✓ Test is inside a <code>test.describe.serial()</code> block<br>
+  ✓ Test passes 3 consecutive times without flakiness
+</div>
+
+<hr class="section-divider">
+
+<!-- SECTION 7 -->
+<h2 id="s7">7. Common Pitfalls &amp; How to Avoid Them</h2>
+
+<table>
+  <tr><th>Pitfall</th><th>Symptom</th><th>Fix</th></tr>
+  <tr>
+    <td>Strict mode violation</td>
+    <td>Test throws "locator resolved to X elements" error</td>
+    <td>Add <code>.first()</code>, <code>.nth(n)</code>, or use a more specific selector. Never use a selector that matches multiple elements when you intend to act on one.</td>
+  </tr>
+  <tr>
+    <td>Login running on every test</td>
+    <td>auth.setup.ts logs in, then each test logs in again — slow and redundant</td>
+    <td>Ensure playwright.config.ts sets <code>storageState: 'src/utils/authentication.json'</code> on the Google Chrome project and that auth.setup.ts is listed as a dependency.</td>
+  </tr>
+  <tr>
+    <td>Logout breaking subsequent tests</td>
+    <td>Tests after the logout test fail with "not authenticated" errors</td>
+    <td>Always put the logout test LAST in a <code>serial</code> block. Logout invalidates the server session — tests that run after it will have stale cookies.</td>
+  </tr>
+  <tr>
+    <td>Hardcoded URLs in tests</td>
+    <td>Tests break when the environment changes; hard to maintain</td>
+    <td>Always use <code>ENV.SOME_URL</code>. The URL lives in <code>.env.test</code>. Changing environments means only changing the env file.</td>
+  </tr>
+  <tr>
+    <td>Selectors in test files</td>
+    <td>A single UI change forces updates across many test files</td>
+    <td>All selectors belong in page object getters. Tests only call page object methods.</td>
+  </tr>
+  <tr>
+    <td>Missing <code>await</code></td>
+    <td>Test passes unreliably or assertions fire before actions complete</td>
+    <td>Every Playwright action and assertion must be awaited. TypeScript will warn about this if you have strict mode on.</td>
+  </tr>
+  <tr>
+    <td>Using <code>page.waitForTimeout()</code> (fixed sleeps)</td>
+    <td>Tests are slow and still flaky on slow networks</td>
+    <td>Use Playwright's built-in auto-wait: <code>toBeVisible({ timeout: 5000 })</code>, <code>toHaveURL()</code>, <code>waitFor({ state: 'visible' })</code>. These retry until the condition is met.</td>
+  </tr>
+  <tr>
+    <td>ENV variable reads as <code>undefined</code></td>
+    <td>Assertion fails comparing against <code>undefined</code>; test passes for wrong reason</td>
+    <td>Check that: (1) the key exists in <code>.env.test</code>, (2) it is declared in <code>env.ts</code>, (3) <code>test_env</code> is being passed correctly when running the test command.</td>
+  </tr>
+  <tr>
+    <td>Test state leak between tests</td>
+    <td>Passing tests depend on a previous test's side effects; tests fail when run alone</td>
+    <td>Each test must set up its own preconditions in <code>beforeEach</code>. Never rely on state left by a previous test unless the entire file is <code>serial</code> and the dependency is intentional and documented.</td>
+  </tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- APPENDIX: TEST INVENTORY -->
+<h2>Appendix: Test Inventory</h2>
+
+<table>
+  <tr><th>File</th><th>Describe Block</th><th>Test Name</th><th>Auth State</th></tr>
+  <tr>
+    <td>login.spec.ts</td>
+    <td>Login tests</td>
+    <td>Successful login with valid credentials</td>
+    <td>No session (empty)</td>
+  </tr>
+  <tr>
+    <td>login.spec.ts</td>
+    <td>Login tests</td>
+    <td>Unsuccessful login with invalid credentials</td>
+    <td>No session (empty)</td>
+  </tr>
+  <tr>
+    <td>login.spec.ts</td>
+    <td>Logout tests</td>
+    <td>Successful logout</td>
+    <td>Authenticated (saved session)</td>
+  </tr>
+  <tr>
+    <td>profile.spec.ts</td>
+    <td>Profile tests</td>
+    <td>Edit profile - validation error on empty name fields</td>
+    <td>Authenticated (saved session)</td>
+  </tr>
+  <tr>
+    <td>profile.spec.ts</td>
+    <td>Profile tests</td>
+    <td>Edit profile - successfully update name</td>
+    <td>Authenticated (saved session)</td>
+  </tr>
+  <tr>
+    <td>timeOff.spec.ts</td>
+    <td>Time Off tests</td>
+    <td>Navigate to Time Off page and verify employee table shows no data</td>
+    <td>Authenticated (saved session)</td>
+  </tr>
+</table>
+
+<hr class="section-divider">
+
+<!-- APPENDIX: NPM SCRIPTS -->
+<h2>Appendix: npm Scripts</h2>
+
+<table>
+  <tr><th>Command</th><th>What it does</th></tr>
+  <tr><td><code>npm run test:chrome</code></td><td>Runs all tests in Chrome with test environment variables</td></tr>
+  <tr><td><code>npm run test:chrome -- --headed</code></td><td>Runs in headed mode (you see the browser)</td></tr>
+  <tr><td><code>npm run test:chrome -- --grep "login"</code></td><td>Runs only tests whose name contains "login"</td></tr>
+  <tr><td><code>npx playwright show-report</code></td><td>Opens the HTML test report in your browser</td></tr>
+</table>
+
+</body>
+</html>

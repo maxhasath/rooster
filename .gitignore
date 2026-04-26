@@ -1,0 +1,19 @@
+node_modules/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+allure-results
+allure-report
+
+# Auth session — contains live cookies/tokens
+src/utils/authentication.json
+
+# Environment files — contain real credentials
+helper/env/.env.test
+helper/env/.env.stage
+helper/env/.env.prod
+
+# OS
+.DS_Store
+Thumbs.db
+

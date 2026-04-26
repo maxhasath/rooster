@@ -1,0 +1,32 @@
+{
+  "name": "rooster",
+  "version": "1.0.0",
+  "description": "Rooster test automation suite",
+  "main": "index.js",
+  "scripts": {
+    "qa": "cross-env test_env=test npx playwright test",
+    "stage": "cross-env test_env=stage npx playwright test",
+    "prod": "cross-env test_env=prod npx playwright test",
+    "allure": "allure generate ./allure-results -c && allure open"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.42.0",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^5.59.8",
+    "@typescript-eslint/parser": "^5.59.8",
+    "allure-commandline": "^2.27.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.42.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^3.8.0",
+    "allure-playwright": "^2.14.1",
+    "typescript": "^5.1.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.3"
+  },
+  "keywords": []
+}
